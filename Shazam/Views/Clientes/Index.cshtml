@@ -1,0 +1,89 @@
+@model List<Cliente>
+@{
+    ViewData["Title"] = "Clientes";
+    List<Cliente> clientes = Model.OrderBy(c => c.Nome).ToList();
+}
+
+<header class="cabecalho">
+    <div>
+        <p class="cabecalho__sobre">Gestão</p>
+        <h1 class="cabecalho__titulo">Clientes</h1>
+        <p class="cabecalho__descricao">Contactos, dados de acesso e inscrições de cada cliente.</p>
+    </div>
+    <div class="cabecalho__acoes">
+        <a class="btn btn-dark" asp-action="Create">
+            <svg class="ico" aria-hidden="true"><use href="#i-mais"></use></svg>Novo cliente
+        </a>
+    </div>
+</header>
+
+<section class="tabela-cartao">
+    @if (clientes.Count == 0)
+    {
+        <div class="vazio">
+            <div class="vazio__icone"><svg class="ico" aria-hidden="true"><use href="#i-clientes"></use></svg></div>
+            <h2 class="vazio__titulo">Ainda não há clientes registados</h2>
+            <p class="vazio__texto">Ao registar um cliente é criado também o acesso dele à aplicação.</p>
+            <a class="btn btn-dark" asp-action="Create">
+                <svg class="ico" aria-hidden="true"><use href="#i-mais"></use></svg>Novo cliente
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="tabela-cartao__barra">
+            <label class="pesquisa">
+                <span class="visually-hidden">Pesquisar clientes</span>
+                <svg class="ico" aria-hidden="true"><use href="#i-pesquisa"></use></svg>
+                <input type="search" class="form-control" placeholder="Pesquisar por nome, email ou telefone" data-filtro="#tabela-clientes" data-contador="#total-clientes" />
+            </label>
+            <span class="texto-3 small"><span id="total-clientes" class="num">@clientes.Count</span> clientes</span>
+        </div>
+
+        <table class="tabela" id="tabela-clientes">
+            <thead>
+                <tr>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Telefone</th>
+                    <th scope="col">Nascimento</th>
+                    <th scope="col">Username</th>
+                    <th scope="col" class="col-num">Inscrições</th>
+                    <th scope="col"><span class="visually-hidden">Ações</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cliente in clientes)
+                {
+                    <tr>
+                        <td class="col-principal">
+                            <div class="celula-pessoa">
+                                <span class="avatar">@Ui.Iniciais(cliente.Nome)</span>
+                                <div>
+                                    <a class="celula-pessoa__nome" asp-action="Details" asp-route-id="@cliente.Id">@cliente.Nome</a>
+                                    <span class="celula-pessoa__extra">@cliente.Email</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Telefone">@(string.IsNullOrEmpty(cliente.Telefone) ? "—" : cliente.Telefone)</td>
+                        <td data-label="Nascimento">@cliente.DataNascimento.ToString("dd/MM/yyyy")</td>
+                        <td data-label="Username"><span class="mono">@cliente.Utilizador.Username</span></td>
+                        <td data-label="Inscrições" class="col-num">@cliente.Inscricoes.Count</td>
+                        <td class="col-acoes">
+                            <div class="acoes">
+                                <a class="btn btn-sm btn-fantasma btn-icone" asp-action="Details" asp-route-id="@cliente.Id" title="Ver detalhes">
+                                    <svg class="ico" aria-hidden="true"><use href="#i-ver"></use></svg><span class="visually-hidden">Ver @cliente.Nome</span>
+                                </a>
+                                <a class="btn btn-sm btn-fantasma btn-icone" asp-action="Edit" asp-route-id="@cliente.Id" title="Editar">
+                                    <svg class="ico" aria-hidden="true"><use href="#i-editar"></use></svg><span class="visually-hidden">Editar @cliente.Nome</span>
+                                </a>
+                                <a class="btn btn-sm btn-fantasma btn-icone" asp-action="Delete" asp-route-id="@cliente.Id" title="Apagar">
+                                    <svg class="ico" aria-hidden="true"><use href="#i-apagar"></use></svg><span class="visually-hidden">Apagar @cliente.Nome</span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</section>

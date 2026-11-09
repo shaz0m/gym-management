@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "Alterar password";
+}
+
+<div class="cartao cartao-central">
+    <div class="cartao__corpo">
+        <div class="confirmacao__icone">
+            <svg class="ico" aria-hidden="true"><use href="#i-cadeado"></use></svg>
+        </div>
+        <h1 class="confirmacao__titulo">Alterar password</h1>
+        <p class="confirmacao__texto mb-4">No primeiro login é obrigatório definir uma password nova. Use pelo menos 4 caracteres.</p>
+
+        @if (ViewBag.Erro != null)
+        {
+            <div class="aviso aviso--erro" role="alert">
+                <svg class="ico" aria-hidden="true"><use href="#i-aviso"></use></svg>
+                <p class="aviso__texto">@ViewBag.Erro</p>
+            </div>
+        }
+
+        <form method="post" asp-action="AlterarSenha">
+            <div class="campo">
+                <label class="form-label" for="novaPassword">Nova password</label>
+                <div class="campo-password">
+                    <input type="password" id="novaPassword" name="novaPassword" class="form-control"
+                           autocomplete="new-password" minlength="4" required />
+                    <button type="button" class="campo-password__botao" data-mostrar-password
+                            aria-label="Mostrar password" aria-pressed="false">
+                        <svg class="ico" aria-hidden="true"><use href="#i-ver"></use></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="campo">
+                <label class="form-label" for="confirmarPassword">Confirmar password</label>
+                <input type="password" id="confirmarPassword" name="confirmarPassword" class="form-control"
+                       autocomplete="new-password" minlength="4" required />
+            </div>
+            <button type="submit" class="btn btn-dark">Guardar password</button>
+        </form>
+    </div>
+</div>

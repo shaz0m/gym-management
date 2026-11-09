@@ -1,0 +1,23 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Erro";
+}
+
+<div class="cartao confirmacao">
+    <div class="cartao__corpo">
+        <div class="confirmacao__icone"><svg class="ico" aria-hidden="true"><use href="#i-aviso"></use></svg></div>
+        <h1 class="confirmacao__titulo">Não foi possível concluir o pedido</h1>
+        <p class="confirmacao__texto">Ocorreu um erro inesperado. Volte atrás e tente de novo; se o problema continuar, contacte o administrador.</p>
+
+        @if (Model.ShowRequestId)
+        {
+            <dl class="resumo">
+                <dt>Código do pedido</dt>
+                <dd class="mono">@Model.RequestId</dd>
+            </dl>
+        }
+    </div>
+    <div class="form-rodape">
+        <a class="btn btn-dark" href="/">Ir para o início</a>
+    </div>
+</div>

@@ -1,0 +1,79 @@
+@model Aula
+@{
+    ViewData["Title"] = "Editar aula";
+}
+
+<a class="voltar" asp-action="Index"><svg class="ico" aria-hidden="true"><use href="#i-seta-esq"></use></svg>Aulas</a>
+
+<header class="cabecalho">
+    <div>
+        <h1 class="cabecalho__titulo">Editar aula</h1>
+        <p class="cabecalho__descricao">@Model.Nome · @Ui.DiaSemana(Model.DataHoraInicio), @Model.DataHoraInicio.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+</header>
+
+@if (ViewBag.Erro != null)
+{
+    <div class="aviso aviso--erro formulario" role="alert">
+        <svg class="ico" aria-hidden="true"><use href="#i-aviso"></use></svg>
+        <p class="aviso__texto">@ViewBag.Erro</p>
+    </div>
+}
+
+<form method="post" asp-action="Edit" asp-route-id="@Model.Id" class="cartao formulario">
+    <div class="form-secao">
+        <div>
+            <h2 class="form-secao__titulo">Aula</h2>
+            <p class="form-secao__texto">Nome, horário e número de lugares.</p>
+        </div>
+        <div class="campos">
+            <div class="campo campo--largo">
+                <label class="form-label" for="nome">Nome da aula</label>
+                <input type="text" id="nome" name="nome" class="form-control" value="@Model.Nome" required />
+            </div>
+            <div class="campo campo--largo">
+                <label class="form-label" for="dataHoraInicio">Data e hora de início</label>
+                <input type="datetime-local" id="dataHoraInicio" name="dataHoraInicio" class="form-control"
+                       value="@Model.DataHoraInicio.ToString("yyyy-MM-ddTHH:mm")" required />
+            </div>
+            <div class="campo">
+                <label class="form-label" for="duracao">Duração</label>
+                <input type="number" id="duracao" name="duracao" class="form-control" min="1" value="@Model.Duracao" required aria-describedby="duracao-ajuda" />
+                <div class="form-text" id="duracao-ajuda">Em minutos.</div>
+            </div>
+            <div class="campo">
+                <label class="form-label" for="capacidade">Capacidade</label>
+                <input type="number" id="capacidade" name="capacidade" class="form-control" min="1" value="@Model.Capacidade" required aria-describedby="capacidade-ajuda" />
+                <div class="form-text" id="capacidade-ajuda">Número máximo de inscritos.</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-secao">
+        <div>
+            <h2 class="form-secao__titulo">Treinador</h2>
+            <p class="form-secao__texto">Quem dá a aula.</p>
+        </div>
+        <div class="campos">
+            <div class="campo campo--largo">
+                <label class="form-label" for="treinadorId">Treinador responsável</label>
+                <select id="treinadorId" name="treinadorId" class="form-select" required>
+                    @foreach (var treinador in (List<Treinador>)ViewBag.Treinadores)
+                    {
+                        if (treinador.Id == Model.TreinadorId)
+                        {
+                            <option value="@treinador.Id" selected>@treinador.Nome</option>
+                        }
+                        else
+                        {
+                            <option value="@treinador.Id">@treinador.Nome</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-rodape">
+        <a class="btn btn-fantasma" asp-action="Index">Cancelar</a>
+        <button type="submit" class="btn btn-dark">Guardar alterações</button>
+    </div>
+</form>

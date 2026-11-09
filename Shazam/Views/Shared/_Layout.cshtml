@@ -1,0 +1,188 @@
+@{
+    string tipo = Context.Session.GetString("Tipo");
+    string nome = Context.Session.GetString("Nome");
+    string controlador = ViewContext.RouteData.Values["controller"]?.ToString();
+    string acao = ViewContext.RouteData.Values["action"]?.ToString();
+
+    // Indica se o link do menu corresponde à página aberta.
+    bool EstaEm(string c, string a = null)
+    {
+        return controlador == c && (a == null || acao == a);
+    }
+}
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0b0b" />
+    <meta name="description" content="Shazam — gestão de clientes, treinadores, aulas e inscrições do ginásio." />
+    <title>@ViewData["Title"] · Shazam</title>
+    <link rel="icon" href="~/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="~/favicon.ico" />
+    <link rel="preload" href="~/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <a class="saltar" href="#conteudo">Saltar para o conteúdo</a>
+    <partial name="_Icones" />
+
+    <header class="topo">
+        <nav class="navbar navbar-expand-lg navbar-dark" aria-label="Menu principal">
+            <div class="container-xl">
+                <a class="marca" href="/">
+                    <img class="marca__simbolo" src="~/imagens/shazam-simbolo.png" width="133" height="96" alt="" />
+                    <span class="marca__nome">Shazam</span>
+                </a>
+
+                @if (nome != null)
+                {
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
+                            aria-controls="menu" aria-expanded="false" aria-label="Abrir menu">
+                        <svg class="ico ico-menu" aria-hidden="true"><use href="#i-menu"></use></svg>
+                        <svg class="ico ico-fechar" aria-hidden="true"><use href="#i-fechar"></use></svg>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="menu">
+                        <ul class="navbar-nav me-auto">
+                            @if (tipo == "Admin")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(EstaEm("Home") ? "active" : "")" aria-current="@(EstaEm("Home") ? "page" : null)" asp-controller="Home" asp-action="Index">
+                                        <svg class="ico" aria-hidden="true"><use href="#i-painel"></use></svg>Painel
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(EstaEm("Clientes") ? "active" : "")" aria-current="@(EstaEm("Clientes") ? "page" : null)" asp-controller="Clientes" asp-action="Index">
+                                        <svg class="ico" aria-hidden="true"><use href="#i-clientes"></use></svg>Clientes
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(EstaEm("Treinadores") ? "active" : "")" aria-current="@(EstaEm("Treinadores") ? "page" : null)" asp-controller="Treinadores" asp-action="Index">
+                                        <svg class="ico" aria-hidden="true"><use href="#i-treinador"></use></svg>Treinadores
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(EstaEm("Aulas") ? "active" : "")" aria-current="@(EstaEm("Aulas") ? "page" : null)" asp-controller="Aulas" asp-action="Index">
+                                        <svg class="ico" aria-hidden="true"><use href="#i-aulas"></use></svg>Aulas
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(EstaEm("Inscricoes") ? "active" : "")" aria-current="@(EstaEm("Inscricoes") ? "page" : null)" asp-controller="Inscricoes" asp-action="Index">
+                                        <svg class="ico" aria-hidden="true"><use href="#i-inscricoes"></use></svg>Inscrições
+                                    </a>
+                                </li>
+                            }
+                            @if (tipo == "Treinador")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(EstaEm("Painel") ? "active" : "")" aria-current="@(EstaEm("Painel") ? "page" : null)" asp-controller="Painel" asp-action="Treinador">
+                                        <svg class="ico" aria-hidden="true"><use href="#i-painel"></use></svg>O meu painel
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(EstaEm("Aulas") ? "active" : "")" aria-current="@(EstaEm("Aulas") ? "page" : null)" asp-controller="Aulas" asp-action="Index">
+                                        <svg class="ico" aria-hidden="true"><use href="#i-aulas"></use></svg>Aulas
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(EstaEm("Clientes") ? "active" : "")" aria-current="@(EstaEm("Clientes") ? "page" : null)" asp-controller="Clientes" asp-action="Index">
+                                        <svg class="ico" aria-hidden="true"><use href="#i-clientes"></use></svg>Clientes
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link @(EstaEm("Inscricoes") ? "active" : "")" aria-current="@(EstaEm("Inscricoes") ? "page" : null)" asp-controller="Inscricoes" asp-action="Index">
+                                        <svg class="ico" aria-hidden="true"><use href="#i-inscricoes"></use></svg>Inscrições
+                                    </a>
+                                </li>
+                            }
+                            @if (tipo == "Cliente")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(EstaEm("Painel") ? "active" : "")" aria-current="@(EstaEm("Painel") ? "page" : null)" asp-controller="Painel" asp-action="Cliente">
+                                        <svg class="ico" aria-hidden="true"><use href="#i-aulas"></use></svg>Aulas e inscrições
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+
+                        <div class="dropdown">
+                            <button class="utilizador" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="avatar avatar--claro avatar--sm">@Ui.Iniciais(nome)</span>
+                                <span class="utilizador__texto">
+                                    <span class="utilizador__nome">@nome</span>
+                                    @if (Ui.NomeTipo(tipo) != nome)
+                                    {
+                                        <span class="utilizador__tipo">@Ui.NomeTipo(tipo)</span>
+                                    }
+                                </span>
+                                <svg class="ico" aria-hidden="true"><use href="#i-baixo"></use></svg>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-lg-end">
+                                <li class="dropdown-cabeca">
+                                    <span class="avatar avatar--escuro">@Ui.Iniciais(nome)</span>
+                                    <span><strong>@nome</strong><span class="dropdown-cabeca__tipo">Sessão de @Ui.NomeTipo(tipo).ToLower()</span></span>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Conta" asp-action="AlterarSenha">
+                                        <svg class="ico" aria-hidden="true"><use href="#i-cadeado"></use></svg>Alterar password
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Conta" asp-action="Logout">
+                                        <svg class="ico" aria-hidden="true"><use href="#i-sair"></use></svg>Terminar sessão
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+        </nav>
+    </header>
+
+    <main id="conteudo" class="conteudo" tabindex="-1">
+        <div class="container-xl">
+            @if (TempData["Mensagem"] != null)
+            {
+                <div class="aviso aviso--sucesso" role="status">
+                    <svg class="ico" aria-hidden="true"><use href="#i-ok"></use></svg>
+                    <p class="aviso__texto">@TempData["Mensagem"]</p>
+                    <button type="button" class="aviso__fechar" data-fechar-aviso aria-label="Fechar aviso">
+                        <svg class="ico" aria-hidden="true"><use href="#i-fechar"></use></svg>
+                    </button>
+                </div>
+            }
+            @if (TempData["Erro"] != null)
+            {
+                <div class="aviso aviso--erro" role="alert">
+                    <svg class="ico" aria-hidden="true"><use href="#i-aviso"></use></svg>
+                    <p class="aviso__texto">@TempData["Erro"]</p>
+                    <button type="button" class="aviso__fechar" data-fechar-aviso aria-label="Fechar aviso">
+                        <svg class="ico" aria-hidden="true"><use href="#i-fechar"></use></svg>
+                    </button>
+                </div>
+            }
+
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="rodape">
+        <div class="container-xl rodape__linha">
+            <span>&copy; 2026 Shazam — Gestão de Ginásio</span>
+            @if (tipo == "Admin" && !string.IsNullOrEmpty(Shazam.Data.BaseDeDadosEmUso.Descricao))
+            {
+                <span title="Base de dados em uso">Base de dados: @Shazam.Data.BaseDeDadosEmUso.Descricao</span>
+            }
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

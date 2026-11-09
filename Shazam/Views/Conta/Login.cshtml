@@ -1,0 +1,45 @@
+@{
+    ViewData["Title"] = "Entrar";
+    Layout = "_LayoutAcesso";
+}
+
+<div class="acesso__form">
+    <h1 class="acesso__titulo">Entrar</h1>
+    <p class="acesso__texto">Aceda com o username e a password que recebeu do ginásio.</p>
+
+    @if (ViewBag.Erro != null)
+    {
+        <div class="aviso aviso--erro" role="alert">
+            <svg class="ico" aria-hidden="true"><use href="#i-aviso"></use></svg>
+            <p class="aviso__texto">@ViewBag.Erro</p>
+        </div>
+    }
+
+    <form method="post" asp-action="Login">
+        <div class="campo">
+            <label class="form-label" for="username">Username</label>
+            <input type="text" id="username" name="username" class="form-control"
+                   autocomplete="username" autocapitalize="none" spellcheck="false" required autofocus />
+        </div>
+        <div class="campo">
+            <label class="form-label" for="password">Password</label>
+            <div class="campo-password">
+                <input type="password" id="password" name="password" class="form-control"
+                       autocomplete="current-password" required />
+                <button type="button" class="campo-password__botao" data-mostrar-password
+                        aria-label="Mostrar password" aria-pressed="false">
+                    <svg class="ico" aria-hidden="true"><use href="#i-ver"></use></svg>
+                </button>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-dark">
+            Entrar
+            <svg class="ico" aria-hidden="true"><use href="#i-seta-dir"></use></svg>
+        </button>
+    </form>
+
+    <p class="acesso__nota">
+        <svg class="ico" aria-hidden="true"><use href="#i-cadeado"></use></svg>
+        <span>No primeiro acesso é pedido que defina uma password nova.</span>
+    </p>
+</div>

@@ -1,0 +1,27 @@
+@model Inscricao
+@{
+    ViewData["Title"] = "Apagar inscrição";
+}
+
+<div class="cartao confirmacao">
+    <div class="cartao__corpo">
+        <div class="confirmacao__icone"><svg class="ico" aria-hidden="true"><use href="#i-aviso"></use></svg></div>
+        <h1 class="confirmacao__titulo">Apagar esta inscrição?</h1>
+        <p class="confirmacao__texto">O lugar na aula fica novamente livre. Esta ação não pode ser anulada.</p>
+
+        <dl class="resumo">
+            <dt>Cliente</dt>
+            <dd>@Model.Cliente.Nome</dd>
+            <dt>Aula</dt>
+            <dd>@Model.Aula.Nome · @Model.Aula.DataHoraInicio.ToString("dd/MM/yyyy HH:mm")</dd>
+            <dt>Inscrito em</dt>
+            <dd>@Model.DataInscricao.ToString("dd/MM/yyyy HH:mm")</dd>
+        </dl>
+    </div>
+    <form method="post" asp-action="Delete" asp-route-id="@Model.Id" class="form-rodape">
+        <a class="btn btn-fantasma" asp-action="Index">Cancelar</a>
+        <button type="submit" class="btn btn-dark">
+            <svg class="ico" aria-hidden="true"><use href="#i-apagar"></use></svg>Apagar inscrição
+        </button>
+    </form>
+</div>

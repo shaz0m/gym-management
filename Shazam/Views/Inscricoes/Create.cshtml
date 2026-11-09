@@ -1,0 +1,53 @@
+@{
+    ViewData["Title"] = "Nova inscrição";
+}
+
+<a class="voltar" asp-action="Index"><svg class="ico" aria-hidden="true"><use href="#i-seta-esq"></use></svg>Inscrições</a>
+
+<header class="cabecalho">
+    <div>
+        <h1 class="cabecalho__titulo">Nova inscrição</h1>
+        <p class="cabecalho__descricao">Inscreve um cliente numa aula. Não é possível inscrever duas vezes na mesma aula nem numa aula lotada.</p>
+    </div>
+</header>
+
+@if (ViewBag.Erro != null)
+{
+    <div class="aviso aviso--erro formulario" role="alert">
+        <svg class="ico" aria-hidden="true"><use href="#i-aviso"></use></svg>
+        <p class="aviso__texto">@ViewBag.Erro</p>
+    </div>
+}
+
+<form method="post" asp-action="Create" class="cartao formulario">
+    <div class="form-secao">
+        <div>
+            <h2 class="form-secao__titulo">Inscrição</h2>
+            <p class="form-secao__texto">Escolha o cliente e a aula.</p>
+        </div>
+        <div class="campos">
+            <div class="campo campo--largo">
+                <label class="form-label" for="clienteId">Cliente</label>
+                <select id="clienteId" name="clienteId" class="form-select" required>
+                    @foreach (var cliente in ((List<Cliente>)ViewBag.Clientes).OrderBy(c => c.Nome))
+                    {
+                        <option value="@cliente.Id">@cliente.Nome</option>
+                    }
+                </select>
+            </div>
+            <div class="campo campo--largo">
+                <label class="form-label" for="aulaId">Aula</label>
+                <select id="aulaId" name="aulaId" class="form-select" required>
+                    @foreach (var aula in Ui.OrdenarAulas((List<Aula>)ViewBag.Aulas))
+                    {
+                        <option value="@aula.Id">@aula.Nome — @Ui.DiaSemana(aula.DataHoraInicio), @aula.DataHoraInicio.ToString("dd/MM/yyyy HH:mm")</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-rodape">
+        <a class="btn btn-fantasma" asp-action="Index">Cancelar</a>
+        <button type="submit" class="btn btn-dark">Inscrever</button>
+    </div>
+</form>

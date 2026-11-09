@@ -1,0 +1,53 @@
+@model Cliente
+@{
+    ViewData["Title"] = "Editar cliente";
+}
+
+<a class="voltar" asp-action="Index"><svg class="ico" aria-hidden="true"><use href="#i-seta-esq"></use></svg>Clientes</a>
+
+<header class="cabecalho">
+    <div>
+        <h1 class="cabecalho__titulo">Editar cliente</h1>
+        <p class="cabecalho__descricao">@Model.Nome</p>
+    </div>
+</header>
+
+@if (ViewBag.Erro != null)
+{
+    <div class="aviso aviso--erro formulario" role="alert">
+        <svg class="ico" aria-hidden="true"><use href="#i-aviso"></use></svg>
+        <p class="aviso__texto">@ViewBag.Erro</p>
+    </div>
+}
+
+<form method="post" asp-action="Edit" asp-route-id="@Model.Id" class="cartao formulario">
+    <div class="form-secao">
+        <div>
+            <h2 class="form-secao__titulo">Dados pessoais</h2>
+            <p class="form-secao__texto">Como contactar o cliente.</p>
+        </div>
+        <div class="campos">
+            <div class="campo campo--largo">
+                <label class="form-label" for="nome">Nome</label>
+                <input type="text" id="nome" name="nome" class="form-control" value="@Model.Nome" autocomplete="off" required />
+            </div>
+            <div class="campo campo--largo">
+                <label class="form-label" for="email">Email</label>
+                <input type="email" id="email" name="email" class="form-control" value="@Model.Email" autocomplete="off" required />
+            </div>
+            <div class="campo">
+                <label class="form-label" for="telefone">Telefone <span class="texto-3 fw-normal">(opcional)</span></label>
+                <input type="tel" id="telefone" name="telefone" class="form-control" value="@Model.Telefone" autocomplete="off" />
+            </div>
+            <div class="campo">
+                <label class="form-label" for="dataNascimento">Data de nascimento</label>
+                <input type="date" id="dataNascimento" name="dataNascimento" class="form-control"
+                       value="@Model.DataNascimento.ToString("yyyy-MM-dd")" required />
+            </div>
+        </div>
+    </div>
+    <div class="form-rodape">
+        <a class="btn btn-fantasma" asp-action="Index">Cancelar</a>
+        <button type="submit" class="btn btn-dark">Guardar alterações</button>
+    </div>
+</form>

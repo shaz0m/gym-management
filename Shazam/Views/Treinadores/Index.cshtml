@@ -1,0 +1,90 @@
+@model List<Treinador>
+@{
+    ViewData["Title"] = "Treinadores";
+    List<Treinador> treinadores = Model.OrderBy(t => t.Nome).ToList();
+}
+
+<header class="cabecalho">
+    <div>
+        <p class="cabecalho__sobre">Gestão</p>
+        <h1 class="cabecalho__titulo">Treinadores</h1>
+        <p class="cabecalho__descricao">Equipa técnica, especialidades e número de aulas de cada treinador.</p>
+    </div>
+    <div class="cabecalho__acoes">
+        <a class="btn btn-dark" asp-action="Create">
+            <svg class="ico" aria-hidden="true"><use href="#i-mais"></use></svg>Novo treinador
+        </a>
+    </div>
+</header>
+
+<section class="tabela-cartao">
+    @if (treinadores.Count == 0)
+    {
+        <div class="vazio">
+            <div class="vazio__icone"><svg class="ico" aria-hidden="true"><use href="#i-treinador"></use></svg></div>
+            <h2 class="vazio__titulo">Ainda não há treinadores registados</h2>
+            <p class="vazio__texto">É preciso pelo menos um treinador para criar aulas.</p>
+            <a class="btn btn-dark" asp-action="Create">
+                <svg class="ico" aria-hidden="true"><use href="#i-mais"></use></svg>Novo treinador
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="tabela-cartao__barra">
+            <label class="pesquisa">
+                <span class="visually-hidden">Pesquisar treinadores</span>
+                <svg class="ico" aria-hidden="true"><use href="#i-pesquisa"></use></svg>
+                <input type="search" class="form-control" placeholder="Pesquisar por nome ou especialidade" data-filtro="#tabela-treinadores" data-contador="#total-treinadores" />
+            </label>
+            <span class="texto-3 small"><span id="total-treinadores" class="num">@treinadores.Count</span> treinadores</span>
+        </div>
+
+        <table class="tabela" id="tabela-treinadores">
+            <thead>
+                <tr>
+                    <th scope="col">Treinador</th>
+                    <th scope="col">Especialidade</th>
+                    <th scope="col">Username</th>
+                    <th scope="col" class="col-num">Aulas</th>
+                    <th scope="col"><span class="visually-hidden">Ações</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var treinador in treinadores)
+                {
+                    <tr>
+                        <td class="col-principal">
+                            <div class="celula-pessoa">
+                                <span class="avatar avatar--escuro">@Ui.Iniciais(treinador.Nome)</span>
+                                <span class="celula-pessoa__nome">@treinador.Nome</span>
+                            </div>
+                        </td>
+                        <td data-label="Especialidade">
+                            @if (string.IsNullOrEmpty(treinador.Especialidade))
+                            {
+                                <span class="texto-3">—</span>
+                            }
+                            else
+                            {
+                                <span class="etiqueta">@treinador.Especialidade</span>
+                            }
+                        </td>
+                        <td data-label="Username"><span class="mono">@treinador.Utilizador.Username</span></td>
+                        <td data-label="Aulas" class="col-num">@treinador.Aulas.Count</td>
+                        <td class="col-acoes">
+                            <div class="acoes">
+                                <a class="btn btn-sm btn-fantasma btn-icone" asp-action="Edit" asp-route-id="@treinador.Id" title="Editar">
+                                    <svg class="ico" aria-hidden="true"><use href="#i-editar"></use></svg><span class="visually-hidden">Editar @treinador.Nome</span>
+                                </a>
+                                <a class="btn btn-sm btn-fantasma btn-icone" asp-action="Delete" asp-route-id="@treinador.Id" title="Apagar">
+                                    <svg class="ico" aria-hidden="true"><use href="#i-apagar"></use></svg><span class="visually-hidden">Apagar @treinador.Nome</span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</section>

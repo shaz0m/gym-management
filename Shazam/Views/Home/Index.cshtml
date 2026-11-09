@@ -1,0 +1,152 @@
+@{
+    ViewData["Title"] = "Painel";
+    List<Aula> proximasAulas = ViewBag.ProximasAulas;
+    List<Inscricao> ultimasInscricoes = ViewBag.UltimasInscricoes;
+    int vagasFuturas = ViewBag.VagasFuturas;
+    int inscritosFuturos = ViewBag.InscritosFuturos;
+    int ocupacao = Ui.Percentagem(inscritosFuturos, vagasFuturas);
+}
+
+<header class="cabecalho">
+    <div>
+        <p class="cabecalho__sobre">@Ui.DataLonga(DateTime.Now)</p>
+        <h1 class="cabecalho__titulo">Painel</h1>
+        <p class="cabecalho__descricao">Resumo do ginásio Shazam.</p>
+    </div>
+    <div class="cabecalho__acoes">
+        <a class="btn btn-outline-dark" asp-controller="Clientes" asp-action="Create">
+            <svg class="ico" aria-hidden="true"><use href="#i-mais"></use></svg>Novo cliente
+        </a>
+        <a class="btn btn-dark" asp-controller="Aulas" asp-action="Create">
+            <svg class="ico" aria-hidden="true"><use href="#i-mais"></use></svg>Nova aula
+        </a>
+    </div>
+</header>
+
+<div class="indicadores">
+    <a class="indicador" asp-controller="Clientes" asp-action="Index">
+        <span class="indicador__topo">Clientes <span class="indicador__icone"><svg class="ico" aria-hidden="true"><use href="#i-clientes"></use></svg></span></span>
+        <span class="indicador__valor">@ViewBag.TotalClientes</span>
+        <span class="indicador__rodape">Ver clientes <svg class="ico" aria-hidden="true"><use href="#i-seta-dir"></use></svg></span>
+    </a>
+    <a class="indicador" asp-controller="Treinadores" asp-action="Index">
+        <span class="indicador__topo">Treinadores <span class="indicador__icone"><svg class="ico" aria-hidden="true"><use href="#i-treinador"></use></svg></span></span>
+        <span class="indicador__valor">@ViewBag.TotalTreinadores</span>
+        <span class="indicador__rodape">Ver treinadores <svg class="ico" aria-hidden="true"><use href="#i-seta-dir"></use></svg></span>
+    </a>
+    <a class="indicador" asp-controller="Aulas" asp-action="Index">
+        <span class="indicador__topo">Aulas <span class="indicador__icone"><svg class="ico" aria-hidden="true"><use href="#i-aulas"></use></svg></span></span>
+        <span class="indicador__valor">@ViewBag.TotalAulas</span>
+        <span class="indicador__rodape">Ver aulas <svg class="ico" aria-hidden="true"><use href="#i-seta-dir"></use></svg></span>
+    </a>
+    <a class="indicador" asp-controller="Inscricoes" asp-action="Index">
+        <span class="indicador__topo">Inscrições <span class="indicador__icone"><svg class="ico" aria-hidden="true"><use href="#i-inscricoes"></use></svg></span></span>
+        <span class="indicador__valor">@ViewBag.TotalInscricoes</span>
+        <span class="indicador__rodape">Ver inscrições <svg class="ico" aria-hidden="true"><use href="#i-seta-dir"></use></svg></span>
+    </a>
+</div>
+
+<div class="grelha-painel">
+    <section class="cartao" aria-labelledby="titulo-proximas">
+        <div class="cartao__cabeca">
+            <h2 class="cartao__titulo" id="titulo-proximas">Próximas aulas</h2>
+            <a class="cartao__link" asp-controller="Aulas" asp-action="Index">Todas as aulas <svg class="ico" aria-hidden="true"><use href="#i-seta-dir"></use></svg></a>
+        </div>
+
+        @if (proximasAulas.Count == 0)
+        {
+            <div class="vazio vazio--compacto">
+                <div class="vazio__icone"><svg class="ico" aria-hidden="true"><use href="#i-aulas"></use></svg></div>
+                <h3 class="vazio__titulo">Sem aulas agendadas</h3>
+                <p class="vazio__texto">As aulas marcadas a partir de hoje aparecem aqui.</p>
+            </div>
+        }
+        else
+        {
+            <ul class="agenda">
+                @foreach (var aula in proximasAulas)
+                {
+                    int inscritos = aula.Inscricoes.Count;
+                    <li class="agenda__item">
+                        <div class="data-bloco">
+                            <span class="data-bloco__dia">@aula.DataHoraInicio.ToString("dd")</span>
+                            <span class="data-bloco__mes">@Ui.Mes(aula.DataHoraInicio)</span>
+                        </div>
+                        <div>
+                            <p class="agenda__nome"><a asp-controller="Aulas" asp-action="Details" asp-route-id="@aula.Id">@aula.Nome</a></p>
+                            <p class="agenda__meta">
+                                <span><svg class="ico" aria-hidden="true"><use href="#i-relogio"></use></svg>@Ui.DiaSemana(aula.DataHoraInicio), @aula.DataHoraInicio.ToString("HH:mm") · @aula.Duracao min</span>
+                                <span><svg class="ico" aria-hidden="true"><use href="#i-treinador"></use></svg>@aula.Treinador.Nome</span>
+                            </p>
+                        </div>
+                        <div class="agenda__lado">
+                            <div class="ocupacao">
+                                <span class="ocupacao__texto">
+                                    @if (inscritos >= aula.Capacidade)
+                                    {
+                                        <strong>Lotada</strong>
+                                    }
+                                    else
+                                    {
+                                        <span>Inscritos</span>
+                                    }
+                                    <span><strong>@inscritos</strong>/@aula.Capacidade</span>
+                                </span>
+                                <progress class="ocupacao__barra" value="@inscritos" max="@aula.Capacidade">@inscritos de @aula.Capacidade</progress>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+
+    <div class="grelha-painel__lateral">
+        <section class="cartao cartao--escuro" aria-labelledby="titulo-ocupacao">
+            <div class="cartao__corpo">
+                <h2 class="cartao__titulo" id="titulo-ocupacao">
+                    <svg class="ico" aria-hidden="true"><use href="#i-ocupacao"></use></svg>Ocupação
+                </h2>
+                <p class="indicador__valor mb-1">@ocupacao<small>%</small></p>
+                <p class="cartao__nota">Lugares ocupados nas aulas que ainda vão acontecer.</p>
+                <div class="ocupacao ocupacao--escura">
+                    <span class="ocupacao__texto">
+                        <span><strong>@inscritosFuturos</strong> inscritos</span>
+                        <span>@vagasFuturas lugares</span>
+                    </span>
+                    <progress class="ocupacao__barra" value="@inscritosFuturos" max="@(vagasFuturas > 0 ? vagasFuturas : 1)">@ocupacao%</progress>
+                </div>
+            </div>
+        </section>
+
+        <section class="cartao" aria-labelledby="titulo-ultimas">
+            <div class="cartao__cabeca">
+                <h2 class="cartao__titulo" id="titulo-ultimas">Últimas inscrições</h2>
+                <a class="cartao__link" asp-controller="Inscricoes" asp-action="Index">Ver todas <svg class="ico" aria-hidden="true"><use href="#i-seta-dir"></use></svg></a>
+            </div>
+
+            @if (ultimasInscricoes.Count == 0)
+            {
+                <div class="vazio vazio--compacto">
+                    <p class="vazio__texto">Ainda não há inscrições.</p>
+                </div>
+            }
+            else
+            {
+                <ul class="lista">
+                    @foreach (var inscricao in ultimasInscricoes)
+                    {
+                        <li class="lista__item">
+                            <span class="avatar avatar--sm">@Ui.Iniciais(inscricao.Cliente.Nome)</span>
+                            <div class="lista__texto">
+                                <strong>@inscricao.Cliente.Nome</strong>
+                                <span>@inscricao.Aula.Nome · @inscricao.Aula.DataHoraInicio.ToString("dd/MM HH:mm")</span>
+                            </div>
+                            <span class="lista__hora">@inscricao.DataInscricao.ToString("dd/MM")</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </section>
+    </div>
+</div>

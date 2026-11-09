@@ -1,0 +1,95 @@
+@model Aula
+@{
+    ViewData["Title"] = Model.Nome;
+    int inscritos = Model.Inscricoes.Count;
+    string estado = Ui.EstadoAula(Model);
+    List<Inscricao> inscricoes = Model.Inscricoes.OrderBy(i => i.Cliente.Nome).ToList();
+}
+
+<a class="voltar" asp-action="Index"><svg class="ico" aria-hidden="true"><use href="#i-seta-esq"></use></svg>Aulas</a>
+
+<header class="cabecalho">
+    <div>
+        <p class="cabecalho__sobre">Aula</p>
+        <h1 class="cabecalho__titulo">@Model.Nome</h1>
+    </div>
+    <div class="cabecalho__acoes">
+        <a class="btn btn-outline-dark" asp-action="Edit" asp-route-id="@Model.Id">
+            <svg class="ico" aria-hidden="true"><use href="#i-editar"></use></svg>Editar
+        </a>
+    </div>
+</header>
+
+<div class="grelha-detalhe">
+    <section class="cartao" aria-label="Resumo da aula">
+        <div class="perfil">
+            <div class="data-bloco">
+                <span class="data-bloco__dia">@Model.DataHoraInicio.ToString("dd")</span>
+                <span class="data-bloco__mes">@Ui.Mes(Model.DataHoraInicio)</span>
+            </div>
+            <p class="perfil__nome h4">@Ui.DiaSemana(Model.DataHoraInicio), @Model.DataHoraInicio.ToString("HH:mm")</p>
+            <p class="perfil__extra">@Model.DataHoraInicio.ToString("dd/MM/yyyy") · @Model.Duracao minutos</p>
+            <p class="mt-3 mb-0"><span class="estado @Ui.ClasseEstado(estado)">@estado</span></p>
+        </div>
+        <ul class="dados">
+            <li class="dados__item">
+                <span class="avatar avatar--sm avatar--escuro">@Ui.Iniciais(Model.Treinador.Nome)</span>
+                <div>
+                    <span class="dados__rotulo">Treinador</span>
+                    <span class="dados__valor">@Model.Treinador.Nome</span>
+                </div>
+            </li>
+            <li class="dados__item">
+                <svg class="ico" aria-hidden="true"><use href="#i-clientes"></use></svg>
+                <div class="flex-grow-1">
+                    <span class="dados__rotulo">Lugares ocupados</span>
+                    <div class="ocupacao mt-1">
+                        <span class="ocupacao__texto"><span><strong>@inscritos</strong> de @Model.Capacidade</span><span>@Ui.Percentagem(inscritos, Model.Capacidade)%</span></span>
+                        <progress class="ocupacao__barra" value="@inscritos" max="@Model.Capacidade">@inscritos de @Model.Capacidade</progress>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <section class="tabela-cartao" aria-labelledby="titulo-inscritos">
+        <div class="tabela-cartao__barra">
+            <h2 class="cartao__titulo" id="titulo-inscritos">Clientes inscritos <span class="contador">@inscritos</span></h2>
+        </div>
+
+        @if (inscricoes.Count == 0)
+        {
+            <div class="vazio vazio--compacto">
+                <div class="vazio__icone"><svg class="ico" aria-hidden="true"><use href="#i-clientes"></use></svg></div>
+                <p class="vazio__texto">Ainda não há clientes inscritos nesta aula.</p>
+            </div>
+        }
+        else
+        {
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Inscrito em</th>
+                        <th scope="col">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var inscricao in inscricoes)
+                    {
+                        <tr>
+                            <td class="col-principal">
+                                <div class="celula-pessoa">
+                                    <span class="avatar avatar--sm">@Ui.Iniciais(inscricao.Cliente.Nome)</span>
+                                    <span class="celula-pessoa__nome">@inscricao.Cliente.Nome</span>
+                                </div>
+                            </td>
+                            <td data-label="Inscrito em">@inscricao.DataInscricao.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td data-label="Estado"><span class="estado @Ui.ClasseEstado(inscricao.Estado)">@inscricao.Estado</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+</div>

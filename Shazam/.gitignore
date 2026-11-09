@@ -1,0 +1,39 @@
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build results
+bin/
+obj/
+
+## Rider
+.idea/
+
+## Visual Studio Code
+.vscode/
+
+## .NET
+*.dll
+*.exe
+*.pdb
+*.cache
+*.zip
+*.tar.gz
+*.nupkg
+
+## EF Core migrations snapshot may be included, but ignore local user secrets
+secrets.json
+appsettings.*.json
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## Resharper
+_ReSharper*/
+
+## Others
+Thumbs.db
+*.DS_Store

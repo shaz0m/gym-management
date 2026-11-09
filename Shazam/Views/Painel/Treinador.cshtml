@@ -1,0 +1,109 @@
+@model List<Aula>
+@{
+    ViewData["Title"] = "O meu painel";
+    Treinador treinador = ViewBag.Treinador;
+    DateTime agora = DateTime.Now;
+
+    List<Aula> aulas = Ui.OrdenarAulas(Model);
+    List<Aula> futuras = Model.Where(a => a.DataHoraInicio >= agora).ToList();
+    int inscritosFuturos = futuras.Sum(a => a.Inscricoes.Count);
+    int lugaresFuturos = futuras.Sum(a => a.Capacidade);
+}
+
+<header class="cabecalho">
+    <div>
+        <p class="cabecalho__sobre">@(string.IsNullOrEmpty(treinador.Especialidade) ? "Treinador" : treinador.Especialidade)</p>
+        <h1 class="cabecalho__titulo">Olá, @Ui.PrimeiroNome(treinador.Nome)</h1>
+        <p class="cabecalho__descricao">As suas aulas e quem está inscrito em cada uma.</p>
+    </div>
+    <div class="cabecalho__acoes">
+        <a class="btn btn-dark" asp-controller="Aulas" asp-action="Create">
+            <svg class="ico" aria-hidden="true"><use href="#i-mais"></use></svg>Nova aula
+        </a>
+    </div>
+</header>
+
+<div class="indicadores indicadores--3">
+    <div class="indicador">
+        <span class="indicador__topo">Aulas agendadas <span class="indicador__icone"><svg class="ico" aria-hidden="true"><use href="#i-aulas"></use></svg></span></span>
+        <span class="indicador__valor">@futuras.Count</span>
+    </div>
+    <div class="indicador">
+        <span class="indicador__topo">Inscritos <span class="indicador__icone"><svg class="ico" aria-hidden="true"><use href="#i-clientes"></use></svg></span></span>
+        <span class="indicador__valor">@inscritosFuturos</span>
+    </div>
+    <div class="indicador">
+        <span class="indicador__topo">Ocupação <span class="indicador__icone"><svg class="ico" aria-hidden="true"><use href="#i-ocupacao"></use></svg></span></span>
+        <span class="indicador__valor">@Ui.Percentagem(inscritosFuturos, lugaresFuturos)<small>%</small></span>
+    </div>
+</div>
+
+<section class="tabela-cartao" aria-labelledby="titulo-minhas-aulas">
+    <div class="tabela-cartao__barra">
+        <h2 class="cartao__titulo" id="titulo-minhas-aulas">As minhas aulas <span class="contador">@aulas.Count</span></h2>
+    </div>
+
+    @if (aulas.Count == 0)
+    {
+        <div class="vazio">
+            <div class="vazio__icone"><svg class="ico" aria-hidden="true"><use href="#i-aulas"></use></svg></div>
+            <h3 class="vazio__titulo">Ainda não tem aulas criadas</h3>
+            <p class="vazio__texto">Crie a primeira aula e os clientes passam a poder inscrever-se.</p>
+            <a class="btn btn-dark" asp-controller="Aulas" asp-action="Create">
+                <svg class="ico" aria-hidden="true"><use href="#i-mais"></use></svg>Nova aula
+            </a>
+        </div>
+    }
+    else
+    {
+        <table class="tabela">
+            <thead>
+                <tr>
+                    <th scope="col">Aula</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Ocupação</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col"><span class="visually-hidden">Ações</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var aula in aulas)
+                {
+                    int inscritos = aula.Inscricoes.Count;
+                    string estado = Ui.EstadoAula(aula);
+                    <tr>
+                        <td class="col-principal">
+                            <div>
+                                <a class="celula-pessoa__nome" asp-controller="Aulas" asp-action="Details" asp-route-id="@aula.Id">@aula.Nome</a>
+                                <span class="celula-pessoa__extra">@aula.Duracao min</span>
+                            </div>
+                        </td>
+                        <td data-label="Data">
+                            <div>
+                                <span class="quando">@Ui.DiaSemana(aula.DataHoraInicio), @aula.DataHoraInicio.ToString("dd/MM/yyyy")</span>
+                                <span class="celula-pessoa__extra">@aula.DataHoraInicio.ToString("HH:mm")</span>
+                            </div>
+                        </td>
+                        <td data-label="Ocupação">
+                            <div class="ocupacao">
+                                <span class="ocupacao__texto"><span><strong>@inscritos</strong>/@aula.Capacidade</span><span>@Ui.Percentagem(inscritos, aula.Capacidade)%</span></span>
+                                <progress class="ocupacao__barra" value="@inscritos" max="@aula.Capacidade">@inscritos de @aula.Capacidade</progress>
+                            </div>
+                        </td>
+                        <td data-label="Estado"><span class="estado @Ui.ClasseEstado(estado)">@estado</span></td>
+                        <td class="col-acoes">
+                            <div class="acoes">
+                                <a class="btn btn-sm btn-outline-dark" asp-controller="Aulas" asp-action="Details" asp-route-id="@aula.Id">
+                                    <svg class="ico" aria-hidden="true"><use href="#i-clientes"></use></svg>Inscritos
+                                </a>
+                                <a class="btn btn-sm btn-fantasma btn-icone" asp-controller="Aulas" asp-action="Edit" asp-route-id="@aula.Id" title="Editar">
+                                    <svg class="ico" aria-hidden="true"><use href="#i-editar"></use></svg><span class="visually-hidden">Editar @aula.Nome</span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</section>

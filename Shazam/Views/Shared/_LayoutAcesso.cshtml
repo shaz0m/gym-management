@@ -1,0 +1,41 @@
+@* Layout das páginas sem sessão iniciada (login): sem menu, ecrã dividido. *@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0b0b" />
+    <meta name="description" content="Shazam — gestão de clientes, treinadores, aulas e inscrições do ginásio." />
+    <title>@ViewData["Title"] · Shazam</title>
+    <link rel="icon" href="~/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="~/favicon.ico" />
+    <link rel="preload" href="~/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <partial name="_Icones" />
+
+    <div class="acesso">
+        <aside class="acesso__arte">
+            <div class="acesso__topo">
+                <strong>Shazam</strong>
+                <span>Gestão de Ginásio</span>
+            </div>
+            <img class="acesso__logo" src="~/imagens/shazam-640.png" width="640" height="640"
+                 alt="Logótipo Shazam: um raio sobre um haltere, com o nome por baixo" />
+            <div class="acesso__base">
+                <span>Clientes · Treinadores · Aulas · Inscrições</span>
+                <span>&copy; 2026</span>
+            </div>
+        </aside>
+
+        <main class="acesso__painel" id="conteudo">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

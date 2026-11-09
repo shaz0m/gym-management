@@ -1,0 +1,59 @@
+@{
+    ViewData["Title"] = "Novo treinador";
+}
+
+<a class="voltar" asp-action="Index"><svg class="ico" aria-hidden="true"><use href="#i-seta-esq"></use></svg>Treinadores</a>
+
+<header class="cabecalho">
+    <div>
+        <h1 class="cabecalho__titulo">Novo treinador</h1>
+        <p class="cabecalho__descricao">Regista o treinador e cria o acesso dele à aplicação.</p>
+    </div>
+</header>
+
+@if (ViewBag.Erro != null)
+{
+    <div class="aviso aviso--erro formulario" role="alert">
+        <svg class="ico" aria-hidden="true"><use href="#i-aviso"></use></svg>
+        <p class="aviso__texto">@ViewBag.Erro</p>
+    </div>
+}
+
+<form method="post" asp-action="Create" class="cartao formulario">
+    <div class="form-secao">
+        <div>
+            <h2 class="form-secao__titulo">Perfil</h2>
+            <p class="form-secao__texto">Aparece nas aulas que o treinador dá.</p>
+        </div>
+        <div class="campos">
+            <div class="campo campo--largo">
+                <label class="form-label" for="nome">Nome</label>
+                <input type="text" id="nome" name="nome" class="form-control" autocomplete="off" required />
+            </div>
+            <div class="campo campo--largo">
+                <label class="form-label" for="especialidade">Especialidade <span class="texto-3 fw-normal">(opcional)</span></label>
+                <input type="text" id="especialidade" name="especialidade" class="form-control" placeholder="Ex.: Musculação, Yoga, Crossfit" />
+            </div>
+        </div>
+    </div>
+    <div class="form-secao">
+        <div>
+            <h2 class="form-secao__titulo">Acesso</h2>
+            <p class="form-secao__texto">O treinador muda a password no primeiro login.</p>
+        </div>
+        <div class="campos">
+            <div class="campo">
+                <label class="form-label" for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" autocomplete="off" autocapitalize="none" spellcheck="false" required />
+            </div>
+            <div class="campo">
+                <label class="form-label" for="password">Password inicial</label>
+                <input type="text" id="password" name="password" class="form-control" autocomplete="off" spellcheck="false" required />
+            </div>
+        </div>
+    </div>
+    <div class="form-rodape">
+        <a class="btn btn-fantasma" asp-action="Index">Cancelar</a>
+        <button type="submit" class="btn btn-dark">Registar treinador</button>
+    </div>
+</form>

@@ -1,0 +1,202 @@
+@model List<Aula>
+@{
+    ViewData["Title"] = "O meu painel";
+    Cliente cliente = ViewBag.Cliente;
+    List<Inscricao> minhasInscricoes = ViewBag.MinhasInscricoes;
+    DateTime agora = DateTime.Now;
+
+    // Só as aulas que ainda não terminaram, agrupadas por dia (como um horário).
+    // Os próximos 7 dias ficam à vista; os seguintes abrem com "Mostrar mais dias".
+    List<Aula> aulas = Model
+        .Where(a => Ui.EstadoAula(a) != "Terminada")
+        .OrderBy(a => a.DataHoraInicio)
+        .ToList();
+    var dias = aulas.GroupBy(a => a.DataHoraInicio.Date).ToList();
+    var diasDaSemana = dias.Where(d => d.Key < DateTime.Today.AddDays(7)).ToList();
+    var diasSeguintes = dias.Where(d => d.Key >= DateTime.Today.AddDays(7)).ToList();
+
+    HashSet<int> aulasInscrito = minhasInscricoes.Select(i => i.AulaId).ToHashSet();
+
+    // Na lateral: as inscrições em aulas que ainda vão acontecer.
+    List<Inscricao> proximas = minhasInscricoes
+        .Where(i => i.Aula.DataHoraInicio >= agora)
+        .OrderBy(i => i.Aula.DataHoraInicio)
+        .ToList();
+    int realizadas = minhasInscricoes.Count - proximas.Count;
+
+    // Bloco de um dia do horário, com os cartões das aulas.
+    // (É async porque tem um formulário com tag helper.)
+    async Task Dia(IGrouping<DateTime, Aula> dia)
+    {
+        <div class="dia">
+            <h3 class="dia__titulo">@Ui.NomeDia(dia.Key) <span>@dia.Key.ToString("d 'de' MMMM", Ui.Pt)</span></h3>
+            <div class="grelha-aulas">
+                @foreach (var aula in dia)
+                {
+                    int inscritos = aula.Inscricoes.Count;
+                    int vagas = aula.Capacidade - inscritos;
+                    bool aDecorrer = Ui.EstadoAula(aula) == "A decorrer";
+
+                    <article class="aula-cartao @(aDecorrer ? "is-terminada" : "")">
+                        <div class="aula-cartao__topo">
+                            <div class="data-bloco @(aDecorrer ? "data-bloco--claro" : "")">
+                                <span class="data-bloco__dia">@aula.DataHoraInicio.ToString("dd")</span>
+                                <span class="data-bloco__mes">@Ui.Mes(aula.DataHoraInicio)</span>
+                            </div>
+                            <div>
+                                <p class="aula-cartao__quando">@aula.DataHoraInicio.ToString("HH:mm") · @aula.Duracao min</p>
+                                <h4 class="aula-cartao__nome">@aula.Nome</h4>
+                                <p class="aula-cartao__treinador">
+                                    <span class="avatar avatar--xs">@Ui.Iniciais(aula.Treinador.Nome)</span>@aula.Treinador.Nome
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="ocupacao">
+                            <span class="ocupacao__texto">
+                                <span>@(vagas > 0 ? (vagas == 1 ? "1 vaga livre" : vagas + " vagas livres") : "Sem vagas")</span>
+                                <span><strong>@inscritos</strong>/@aula.Capacidade</span>
+                            </span>
+                            <progress class="ocupacao__barra" value="@inscritos" max="@aula.Capacidade">@inscritos de @aula.Capacidade</progress>
+                        </div>
+
+                        <div class="aula-cartao__acao">
+                            @if (aulasInscrito.Contains(aula.Id))
+                            {
+                                <div class="estado-bloco estado-bloco--inscrito">
+                                    <svg class="ico" aria-hidden="true"><use href="#i-check"></use></svg>Inscrito
+                                </div>
+                            }
+                            else if (aDecorrer)
+                            {
+                                <div class="estado-bloco">A decorrer</div>
+                            }
+                            else if (vagas <= 0)
+                            {
+                                <div class="estado-bloco estado-bloco--lotada">Lotada</div>
+                            }
+                            else
+                            {
+                                <form method="post" asp-action="Inscrever">
+                                    <input type="hidden" name="aulaId" value="@aula.Id" />
+                                    <button type="submit" class="btn btn-dark">
+                                        <svg class="ico" aria-hidden="true"><use href="#i-mais"></use></svg>Inscrever-me
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+        </div>
+    }
+}
+
+<header class="cabecalho">
+    <div>
+        <p class="cabecalho__sobre">O meu painel</p>
+        <h1 class="cabecalho__titulo">Olá, @Ui.PrimeiroNome(cliente.Nome)</h1>
+        <p class="cabecalho__descricao">
+            @if (proximas.Count == 0)
+            {
+                <text>Ainda não tem aulas marcadas. Escolha uma aula do horário.</text>
+            }
+            else if (proximas.Count == 1)
+            {
+                <text>Tem 1 aula marcada.</text>
+            }
+            else
+            {
+                <text>Tem @proximas.Count aulas marcadas.</text>
+            }
+        </p>
+    </div>
+</header>
+
+<div class="grelha-painel grelha-painel--cliente">
+    <section aria-labelledby="titulo-horario">
+        <div class="seccao__cabeca">
+            <h2 class="seccao__titulo" id="titulo-horario">Horário <span class="contador">@aulas.Count</span></h2>
+        </div>
+
+        @if (aulas.Count == 0)
+        {
+            <div class="cartao">
+                <div class="vazio">
+                    <div class="vazio__icone"><svg class="ico" aria-hidden="true"><use href="#i-aulas"></use></svg></div>
+                    <h3 class="vazio__titulo">Não há aulas marcadas</h3>
+                    <p class="vazio__texto">Quando o ginásio publicar aulas, aparecem aqui para se inscrever.</p>
+                </div>
+            </div>
+        }
+
+        @foreach (var dia in diasDaSemana)
+        {
+            await Dia(dia);
+        }
+
+        @if (diasSeguintes.Count > 0)
+        {
+            <details class="mais-dias" open="@(diasDaSemana.Count == 0)">
+                <summary>
+                    <span class="mais-dias__abrir">Mostrar mais @diasSeguintes.Count @(diasSeguintes.Count == 1 ? "dia" : "dias")</span>
+                    <span class="mais-dias__fechar">Mostrar menos</span>
+                    <svg class="ico" aria-hidden="true"><use href="#i-baixo"></use></svg>
+                </summary>
+                @foreach (var dia in diasSeguintes)
+                {
+                    await Dia(dia);
+                }
+            </details>
+        }
+    </section>
+
+    <aside class="inscricoes-lateral" aria-labelledby="titulo-inscricoes">
+        <div class="seccao__cabeca">
+            <h2 class="seccao__titulo" id="titulo-inscricoes">As minhas inscrições <span class="contador">@proximas.Count</span></h2>
+        </div>
+
+        <section class="cartao">
+            @if (proximas.Count == 0)
+            {
+                <div class="vazio vazio--compacto">
+                    <div class="vazio__icone"><svg class="ico" aria-hidden="true"><use href="#i-inscricoes"></use></svg></div>
+                    <p class="vazio__texto">Não tem aulas marcadas.</p>
+                </div>
+            }
+            else
+            {
+                <ul class="agenda">
+                    @foreach (var inscricao in proximas)
+                    {
+                        <li class="agenda__item">
+                            <div class="data-bloco">
+                                <span class="data-bloco__dia">@inscricao.Aula.DataHoraInicio.ToString("dd")</span>
+                                <span class="data-bloco__mes">@Ui.Mes(inscricao.Aula.DataHoraInicio)</span>
+                            </div>
+                            <div>
+                                <p class="agenda__nome">@inscricao.Aula.Nome</p>
+                                <p class="agenda__meta">
+                                    <span><svg class="ico" aria-hidden="true"><use href="#i-relogio"></use></svg>@Ui.DiaSemana(inscricao.Aula.DataHoraInicio), @inscricao.Aula.DataHoraInicio.ToString("HH:mm")</span>
+                                    <span>@inscricao.Estado</span>
+                                </p>
+                            </div>
+                            <form method="post" asp-action="Cancelar">
+                                <input type="hidden" name="inscricaoId" value="@inscricao.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-dark">Cancelar</button>
+                            </form>
+                        </li>
+                    }
+                </ul>
+            }
+
+            @if (realizadas > 0)
+            {
+                <p class="cartao__pe">
+                    <svg class="ico" aria-hidden="true"><use href="#i-check"></use></svg>
+                    @realizadas @(realizadas == 1 ? "aula realizada" : "aulas realizadas")
+                </p>
+            }
+        </section>
+    </aside>
+</div>

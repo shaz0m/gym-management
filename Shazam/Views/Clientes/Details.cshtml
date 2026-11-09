@@ -1,0 +1,92 @@
+@model Cliente
+@{
+    ViewData["Title"] = Model.Nome;
+    List<Inscricao> inscricoes = Model.Inscricoes.OrderBy(i => i.Aula.DataHoraInicio).ToList();
+}
+
+<a class="voltar" asp-action="Index"><svg class="ico" aria-hidden="true"><use href="#i-seta-esq"></use></svg>Clientes</a>
+
+<header class="cabecalho">
+    <div>
+        <p class="cabecalho__sobre">Cliente</p>
+        <h1 class="cabecalho__titulo">@Model.Nome</h1>
+    </div>
+    <div class="cabecalho__acoes">
+        <a class="btn btn-outline-dark" asp-action="Edit" asp-route-id="@Model.Id">
+            <svg class="ico" aria-hidden="true"><use href="#i-editar"></use></svg>Editar
+        </a>
+    </div>
+</header>
+
+<div class="grelha-detalhe">
+    <section class="cartao" aria-label="Dados do cliente">
+        <div class="perfil">
+            <span class="avatar avatar--lg avatar--escuro">@Ui.Iniciais(Model.Nome)</span>
+            <p class="perfil__nome h4">@Model.Nome</p>
+            <p class="perfil__extra mono">@Model.Utilizador.Username</p>
+        </div>
+        <ul class="dados">
+            <li class="dados__item">
+                <svg class="ico" aria-hidden="true"><use href="#i-email"></use></svg>
+                <div>
+                    <span class="dados__rotulo">Email</span>
+                    <a class="dados__valor" href="mailto:@Model.Email">@Model.Email</a>
+                </div>
+            </li>
+            <li class="dados__item">
+                <svg class="ico" aria-hidden="true"><use href="#i-telefone"></use></svg>
+                <div>
+                    <span class="dados__rotulo">Telefone</span>
+                    <span class="dados__valor">@(string.IsNullOrEmpty(Model.Telefone) ? "—" : Model.Telefone)</span>
+                </div>
+            </li>
+            <li class="dados__item">
+                <svg class="ico" aria-hidden="true"><use href="#i-aulas"></use></svg>
+                <div>
+                    <span class="dados__rotulo">Data de nascimento</span>
+                    <span class="dados__valor">@Model.DataNascimento.ToString("dd/MM/yyyy")</span>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <section class="tabela-cartao" aria-labelledby="titulo-inscricoes">
+        <div class="tabela-cartao__barra">
+            <h2 class="cartao__titulo" id="titulo-inscricoes">Inscrições em aulas <span class="contador">@inscricoes.Count</span></h2>
+        </div>
+
+        @if (inscricoes.Count == 0)
+        {
+            <div class="vazio vazio--compacto">
+                <div class="vazio__icone"><svg class="ico" aria-hidden="true"><use href="#i-inscricoes"></use></svg></div>
+                <p class="vazio__texto">Este cliente não tem inscrições.</p>
+            </div>
+        }
+        else
+        {
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th scope="col">Aula</th>
+                        <th scope="col">Data da aula</th>
+                        <th scope="col">Inscrito em</th>
+                        <th scope="col">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var inscricao in inscricoes)
+                    {
+                        <tr>
+                            <td class="col-principal">
+                                <a class="celula-pessoa__nome" asp-controller="Aulas" asp-action="Details" asp-route-id="@inscricao.AulaId">@inscricao.Aula.Nome</a>
+                            </td>
+                            <td data-label="Data da aula">@Ui.DiaSemana(inscricao.Aula.DataHoraInicio), @inscricao.Aula.DataHoraInicio.ToString("dd/MM HH:mm")</td>
+                            <td data-label="Inscrito em">@inscricao.DataInscricao.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td data-label="Estado"><span class="estado @Ui.ClasseEstado(inscricao.Estado)">@inscricao.Estado</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+</div>

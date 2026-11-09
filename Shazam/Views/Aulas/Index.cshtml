@@ -1,0 +1,102 @@
+@model List<Aula>
+@{
+    ViewData["Title"] = "Aulas";
+    List<Aula> aulas = Ui.OrdenarAulas(Model);
+}
+
+<header class="cabecalho">
+    <div>
+        <p class="cabecalho__sobre">Gestão</p>
+        <h1 class="cabecalho__titulo">Aulas</h1>
+        <p class="cabecalho__descricao">Horário, treinador responsável e lugares ocupados em cada aula.</p>
+    </div>
+    <div class="cabecalho__acoes">
+        <a class="btn btn-dark" asp-action="Create">
+            <svg class="ico" aria-hidden="true"><use href="#i-mais"></use></svg>Nova aula
+        </a>
+    </div>
+</header>
+
+<section class="tabela-cartao">
+    @if (aulas.Count == 0)
+    {
+        <div class="vazio">
+            <div class="vazio__icone"><svg class="ico" aria-hidden="true"><use href="#i-aulas"></use></svg></div>
+            <h2 class="vazio__titulo">Ainda não há aulas criadas</h2>
+            <p class="vazio__texto">Crie a primeira aula para os clientes se poderem inscrever.</p>
+            <a class="btn btn-dark" asp-action="Create">
+                <svg class="ico" aria-hidden="true"><use href="#i-mais"></use></svg>Nova aula
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="tabela-cartao__barra">
+            <label class="pesquisa">
+                <span class="visually-hidden">Pesquisar aulas</span>
+                <svg class="ico" aria-hidden="true"><use href="#i-pesquisa"></use></svg>
+                <input type="search" class="form-control" placeholder="Pesquisar por aula ou treinador" data-filtro="#tabela-aulas" data-contador="#total-aulas" />
+            </label>
+            <span class="texto-3 small"><span id="total-aulas" class="num">@aulas.Count</span> aulas</span>
+        </div>
+
+        <table class="tabela" id="tabela-aulas">
+            <thead>
+                <tr>
+                    <th scope="col">Aula</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Treinador</th>
+                    <th scope="col">Ocupação</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col"><span class="visually-hidden">Ações</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var aula in aulas)
+                {
+                    int inscritos = aula.Inscricoes.Count;
+                    string estado = Ui.EstadoAula(aula);
+                    <tr>
+                        <td class="col-principal">
+                            <div>
+                                <a class="celula-pessoa__nome" asp-action="Details" asp-route-id="@aula.Id">@aula.Nome</a>
+                                <span class="celula-pessoa__extra">@aula.Duracao min</span>
+                            </div>
+                        </td>
+                        <td data-label="Data">
+                            <div>
+                                <span class="quando">@Ui.DiaSemana(aula.DataHoraInicio), @aula.DataHoraInicio.ToString("dd/MM/yyyy")</span>
+                                <span class="celula-pessoa__extra">@aula.DataHoraInicio.ToString("HH:mm")</span>
+                            </div>
+                        </td>
+                        <td data-label="Treinador">
+                            <span class="celula-pessoa">
+                                <span class="avatar avatar--xs">@Ui.Iniciais(aula.Treinador.Nome)</span>@aula.Treinador.Nome
+                            </span>
+                        </td>
+                        <td data-label="Ocupação">
+                            <div class="ocupacao">
+                                <span class="ocupacao__texto"><span><strong>@inscritos</strong>/@aula.Capacidade</span><span>@Ui.Percentagem(inscritos, aula.Capacidade)%</span></span>
+                                <progress class="ocupacao__barra" value="@inscritos" max="@aula.Capacidade">@inscritos de @aula.Capacidade</progress>
+                            </div>
+                        </td>
+                        <td data-label="Estado"><span class="estado @Ui.ClasseEstado(estado)">@estado</span></td>
+                        <td class="col-acoes">
+                            <div class="acoes">
+                                <a class="btn btn-sm btn-fantasma btn-icone" asp-action="Details" asp-route-id="@aula.Id" title="Ver detalhes">
+                                    <svg class="ico" aria-hidden="true"><use href="#i-ver"></use></svg><span class="visually-hidden">Ver @aula.Nome</span>
+                                </a>
+                                <a class="btn btn-sm btn-fantasma btn-icone" asp-action="Edit" asp-route-id="@aula.Id" title="Editar">
+                                    <svg class="ico" aria-hidden="true"><use href="#i-editar"></use></svg><span class="visually-hidden">Editar @aula.Nome</span>
+                                </a>
+                                <a class="btn btn-sm btn-fantasma btn-icone" asp-action="Delete" asp-route-id="@aula.Id" title="Apagar">
+                                    <svg class="ico" aria-hidden="true"><use href="#i-apagar"></use></svg><span class="visually-hidden">Apagar @aula.Nome</span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</section>

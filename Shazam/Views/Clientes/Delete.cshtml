@@ -1,0 +1,30 @@
+@model Cliente
+@{
+    ViewData["Title"] = "Apagar cliente";
+}
+
+<div class="cartao confirmacao">
+    <div class="cartao__corpo">
+        <div class="confirmacao__icone"><svg class="ico" aria-hidden="true"><use href="#i-aviso"></use></svg></div>
+        <h1 class="confirmacao__titulo">Apagar este cliente?</h1>
+        <p class="confirmacao__texto">
+            Também são apagadas as inscrições dele e o acesso à aplicação.
+            Esta ação não pode ser anulada.
+        </p>
+
+        <dl class="resumo">
+            <dt>Nome</dt>
+            <dd>@Model.Nome</dd>
+            <dt>Email</dt>
+            <dd>@Model.Email</dd>
+            <dt>Username</dt>
+            <dd class="mono">@Model.Utilizador.Username</dd>
+        </dl>
+    </div>
+    <form method="post" asp-action="Delete" asp-route-id="@Model.Id" class="form-rodape">
+        <a class="btn btn-fantasma" asp-action="Index">Cancelar</a>
+        <button type="submit" class="btn btn-dark">
+            <svg class="ico" aria-hidden="true"><use href="#i-apagar"></use></svg>Apagar cliente
+        </button>
+    </form>
+</div>
